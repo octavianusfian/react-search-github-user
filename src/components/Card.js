@@ -1,7 +1,9 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { GithubContext } from "../context/context";
 import styled from "styled-components";
 import { MdBusiness, MdLocationOn, MdLink } from "react-icons/md";
+import { MdFavoriteBorder } from "react-icons/md";
+import { MdFavorite } from "react-icons/md";
 const Card = () => {
   const { githubUser } = useContext(GithubContext);
   const {
@@ -10,10 +12,37 @@ const Card = () => {
     name,
     company,
     blog,
+    login,
     bio,
     location,
     twitter_username,
   } = githubUser;
+
+  const [favorites, setFavorites] = useState(() => {
+    return JSON.parse(localStorage.getItem("favorites")) || [];
+  });
+
+  const stored = JSON.parse(localStorage.getItem("favorites")) || [];
+  const already = stored.find((item) => item.login === login);
+  const toggleFavorite = () => {
+    const already = favorites.find((item) => item.login === login);
+    if (!already) {
+      const updated = [...stored, { login, avatar_url, html_url }];
+      localStorage.setItem("favorites", JSON.stringify(updated));
+      setFavorites(updated); // update UI
+      alert(`${login} telah ditambahkan ke favorit!`);
+    } else {
+      const confirmDelete = window.confirm(
+        `${login} sudah ada di favorit. Hapus dari favorit?`
+      );
+      if (confirmDelete) {
+        const updated = stored.filter((item) => item.login !== login);
+        localStorage.setItem("favorites", JSON.stringify(updated));
+        setFavorites(updated); // update UI
+        alert(`${login} telah dihapus dari favorit.`);
+      }
+    }
+  };
   return (
     <Wrapper>
       <header>
@@ -22,6 +51,9 @@ const Card = () => {
           <h4>{name}</h4>
           <p>@{twitter_username || "octavianusfian"}</p>
         </div>
+        <button className="favorite" onClick={toggleFavorite}>
+          {!already ? <MdFavoriteBorder /> : <MdFavorite />}
+        </button>
         <a href={html_url}>follow</a>
       </header>
       <p className="bio">{bio}</p>
@@ -65,7 +97,7 @@ const Wrapper = styled.article`
   }
   header {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 0.9fr auto auto;
     align-items: center;
     column-gap: 1rem;
     margin-bottom: 1rem;
@@ -97,6 +129,12 @@ const Wrapper = styled.article`
   }
   .bio {
     color: var(--clr-grey-3);
+  }
+  .favorite {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 20px;
   }
   .links {
     p,

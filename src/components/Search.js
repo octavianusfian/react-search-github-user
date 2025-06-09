@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import styled from "styled-components";
 import { MdSearch } from "react-icons/md";
 import { GithubContext } from "../context/context";
+import { Link } from "react-router-dom";
 const Search = () => {
   const [user, setUser] = useState("");
   const { requests, error, searchGithubUser, isLoading } =
@@ -16,7 +17,7 @@ const Search = () => {
   return (
     <section className="section">
       <Wrapper className="section-center">
-        {true && (
+        {error && (
           <ErrorWrapper>
             <p>{error.msg}</p>
           </ErrorWrapper>
@@ -30,9 +31,17 @@ const Search = () => {
               value={user}
               onChange={(e) => setUser(e.target.value)}
             />
-            {requests > 0 && !isLoading && <button type="submit">search</button>}
+            {requests > 0 && !isLoading && (
+              <button type="submit">search</button>
+            )}
           </div>
         </form>
+        <Link
+          to="/favorites"
+          className="inline-block text-center bg-yellow-400 text-black px-6 py-3 rounded-full font-semibold shadow hover:bg-yellow-300 transition"
+        >
+          ⭐ List Favorit
+        </Link>
         <h3>request : {requests} /60</h3>
       </Wrapper>
     </section>
@@ -44,7 +53,7 @@ const Wrapper = styled.div`
   display: grid;
   gap: 1rem 1.75rem;
   @media (min-width: 768px) {
-    grid-template-columns: 1fr max-content;
+    grid-template-columns: 1fr 0.25fr max-content;
     align-items: center;
     h3 {
       padding: 0 0.5rem;
